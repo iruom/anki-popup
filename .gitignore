@@ -1,0 +1,11 @@
+.DS_Store
+build/
+dist/
+*.anki2
+*.anki2-*
+*.apkg
+*.colpkg
+collection.media/
+.env
+*.p12
+*.mobileprovision

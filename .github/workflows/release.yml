@@ -1,0 +1,27 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: ./scripts/test.sh
+      - name: Build
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: VERSION="${RELEASE_TAG#v}" ./scripts/build.sh
+      - name: Publish binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/*.zip dist/SHA256SUMS.txt --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/*.zip dist/SHA256SUMS.txt --title "Anki Popup $RELEASE_TAG" --notes "Universal app for macOS 13+ (Apple silicon and Intel). Ad hoc signed; not Developer ID signed or notarized. See the README for setup, supported note types, and opening instructions."
+          fi

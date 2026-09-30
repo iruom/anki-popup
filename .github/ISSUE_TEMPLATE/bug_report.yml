@@ -1,0 +1,24 @@
+name: Bug report / 不具合
+description: Report a reproducible problem without uploading personal Anki data.
+title: "[Bug] "
+body:
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions / バージョン
+      description: macOS, Anki, Anki Popup, and Intel or Apple silicon.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and expected result / 操作と期待する結果
+      description: Include field names or fictional sample text if relevant. Do not upload your collection or private media.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened / 実際の結果
+    validations:
+      required: true
