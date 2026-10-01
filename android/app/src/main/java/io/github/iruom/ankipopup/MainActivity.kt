@@ -55,6 +55,7 @@ class MainActivity : Activity() {
         language = field(R.string.language, prefs.getString("language", "en-US") ?: "en-US")
         floating = Switch(this).apply { setText(R.string.floating_mode); isChecked = prefs.getBoolean("overlay", true); setOnCheckedChangeListener { _, checked -> prefs.edit().putBoolean("overlay", checked).apply() } }
         column.addView(floating)
+        text(getString(R.string.gesture_help), 13f)
         button(R.string.start) { requestStart(false) }
         val row = LinearLayout(this)
         for ((label, action) in listOf(R.string.next to StudyService.NEXT, R.string.hide to StudyService.HIDE, R.string.stop to StudyService.STOP)) {

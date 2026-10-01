@@ -14,5 +14,7 @@
 <string name="channel">学習カード</string><string name="preparing">学習の準備中…</string><string name="hidden">次の切り替えまでカードを隠しています。</string><string name="session">Anki Popup 学習中</string><string name="speech_unavailable">読み上げ音声が使えません。オフライン音声をインストールするか、音声フォルダを指定してください。</string><string name="notice">音声・一時非表示・いつでも停止</string>
 <string name="floating_mode">他のアプリの上にカードを表示（おすすめ）</string>
 <string name="overlay_required">Android設定でAnki Popupの「他のアプリの上に表示」を許可し、戻ってもう一度「開始」を押してください。</string>
-<string name="drag_card">Anki Popup · ここをドラッグして移動</string>
+<string name="gesture_help">タップで音声・長押しドラッグで移動・右スワイプで次へ・下で例文・上で次のカードまで隠す</string>
+<string name="examples_action">例文を表示・非表示</string>
+<string name="no_examples">このカードには例文フィールドがありません。</string>
 </resources>

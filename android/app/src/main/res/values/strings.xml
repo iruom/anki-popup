@@ -34,5 +34,7 @@
 <string name="notice">Audio · hide until next card · stop at any time</string>
 <string name="floating_mode">Floating card over other apps (recommended)</string>
 <string name="overlay_required">Allow Anki Popup in Android settings → Display over other apps. Return here and press Start again.</string>
-<string name="drag_card">Anki Popup · drag here to move</string>
+<string name="gesture_help">Tap: audio · hold and drag: move · swipe right: next · down: examples · up: hide until next card</string>
+<string name="examples_action">Show or hide examples</string>
+<string name="no_examples">No example fields on this note.</string>
 </resources>

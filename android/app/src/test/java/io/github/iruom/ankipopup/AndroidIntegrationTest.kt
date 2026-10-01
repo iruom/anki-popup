@@ -94,7 +94,7 @@ class AndroidIntegrationTest {
             assertEquals(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, params.type)
             assertTrue(params.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE != 0)
             assertTrue(params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL != 0)
-            assertTrue(params.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+            assertEquals(0, params.flags and WindowManager.LayoutParams.FLAG_SECURE)
         }
         val notification = manager.getNotification(StudyService.NOTIFICATION_ID)
         assertNotNull(notification)
@@ -103,9 +103,8 @@ class AndroidIntegrationTest {
         assertEquals(3, notification.actions.size)
         assertNotEquals(notification.extras.getString(Notification.EXTRA_TITLE), notification.publicVersion.extras.getString(Notification.EXTRA_TITLE))
         if (floating) {
-            val card = windows.views.single() as android.widget.LinearLayout
-            val controls = card.getChildAt(3) as android.widget.LinearLayout
-            controls.getChildAt(2).performClick()
+            val card = windows.views.single().findViewWithTag<android.view.View>("floating_card")
+            card.performAccessibilityAction(R.id.card_hide, null)
         } else service.onStartCommand(Intent(service, StudyService::class.java).setAction(StudyService.HIDE), 0, 2)
         if (floating) assertEquals(0, windows.views.size)
         assertEquals(service.getString(R.string.hidden), manager.getNotification(StudyService.NOTIFICATION_ID).extras.getString(Notification.EXTRA_TEXT))

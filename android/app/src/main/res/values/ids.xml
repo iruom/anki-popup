@@ -1,0 +1,5 @@
+<resources>
+    <item name="card_next" type="id" />
+    <item name="card_examples" type="id" />
+    <item name="card_hide" type="id" />
+</resources>
