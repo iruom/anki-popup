@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.InputType
 import android.view.View
 import android.widget.*
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors
 class MainActivity : Activity() {
     private val worker = Executors.newSingleThreadExecutor()
     private val prefs by lazy { getSharedPreferences("settings", MODE_PRIVATE) }
+    private lateinit var floating: Switch
     private lateinit var deck: Spinner
     private lateinit var interval: EditText
     private lateinit var front: EditText
@@ -51,6 +53,8 @@ class MainActivity : Activity() {
         front = field(R.string.front_field, prefs.getString("front", "") ?: "")
         back = field(R.string.back_field, prefs.getString("back", "") ?: "")
         language = field(R.string.language, prefs.getString("language", "en-US") ?: "en-US")
+        floating = Switch(this).apply { setText(R.string.floating_mode); isChecked = prefs.getBoolean("overlay", true); setOnCheckedChangeListener { _, checked -> prefs.edit().putBoolean("overlay", checked).apply() } }
+        column.addView(floating)
         button(R.string.start) { requestStart(false) }
         val row = LinearLayout(this)
         for ((label, action) in listOf(R.string.next to StudyService.NEXT, R.string.hide to StudyService.HIDE, R.string.stop to StudyService.STOP)) {
@@ -92,6 +96,12 @@ class MainActivity : Activity() {
         }
     }
     private fun requestStart(demo: Boolean) {
+        if (floating.isChecked && !Settings.canDrawOverlays(this)) {
+            status.setText(R.string.overlay_required)
+            try { startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) }
+            catch (_: Exception) { status.setText(R.string.overlay_required) }
+            return
+        }
         if (!demo && checkSelfPermission(AnkiRepository.PERMISSION) != PackageManager.PERMISSION_GRANTED) { connect(); return }
         val seconds = interval.text.toString().toIntOrNull()
         if (seconds == null || seconds !in 5..3600) { status.setText(R.string.bad_interval); return }

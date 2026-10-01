@@ -1,6 +1,6 @@
 <resources>
-<string name="app_name">Anki Popup</string><string name="tagline">通知に、少しずつ学習を。</string>
-<string name="intro">AnkiDroidのデッキから表と裏を一緒に表示します。初期設定は30秒ごと。同じ通知を静かに更新します。</string>
+<string name="app_name">Anki Popup</string><string name="tagline">作業中の画面に、少しずつ学習を。</string>
+<string name="intro">表と裏を他のアプリの上に表示し、初期設定では30秒ごとに切り替えます。案内が出たら「他のアプリの上に表示」を許可してください。</string>
 <string name="connect">AnkiDroidに接続・デッキを再読込</string><string name="all_decks">すべてのデッキ</string><string name="deck">デッキ</string>
 <string name="interval">表示間隔（秒・5〜3600）</string><string name="front_field">表のフィールド名（空欄＝自動）</string><string name="back_field">裏のフィールド名（空欄＝自動）</string>
 <string name="language">読み上げの言語（例: en-US、ja-JP）</string><string name="start">開始</string><string name="next">次へ</string><string name="stop">停止</string><string name="hide">隠す</string><string name="audio">音声</string>
@@ -8,8 +8,11 @@
 <string name="media_set">音声フォルダを指定済み。見つからない音声は端末で読み上げます。</string><string name="media_unset">音声は端末の読み上げを使います。読み取れるフォルダを指定するとAnkiの録音も使えます。</string>
 <string name="limits">ノートの文字フィールドを表示します。独自テンプレートや穴埋めの再現は未対応。子デッキも対象です。学習履歴は変更しません。スリープ中や省電力制限で更新が遅れる場合があります。</string>
 <string name="privacy">カードを外部に送信しません。AnkiDroidの連携権限は読み書き共通ですが、このアプリは読み取りのみ。通知内容はロック画面で非公開扱いにします。読み上げは利用可能なオフライン音声を優先します。</string>
-<string name="ready">準備できました。学習したいときに開始してください。</string><string name="working">読み込み中…</string><string name="running">学習中。通知を広げると意味が見えます。</string><string name="stopped">停止しました。</string>
+<string name="ready">準備できました。学習したいときに開始してください。</string><string name="working">読み込み中…</string><string name="running">学習中。他のアプリの上にカードが表示されます。</string><string name="stopped">停止しました。</string>
 <string name="api_missing">AnkiDroidをインストールして一度開き、設定 → 詳細からAPIを有効にしてください。その後もう一度接続してください。</string><string name="api_denied">AnkiDroidへのアクセスが許可されませんでした。サンプルモードは使えます。</string>
 <string name="notification_denied">開始する前にAndroid設定で通知を許可してください。</string><string name="bad_interval">表示間隔は5〜3600秒の整数で指定してください。</string><string name="no_cards">表示できるカードがありません。デッキと表・裏のフィールド名を確認してください。</string><string name="error">AnkiDroidを読み込めません。APIの権限とフィールドの設定を確認して再度試してください。</string>
 <string name="channel">学習カード</string><string name="preparing">学習の準備中…</string><string name="hidden">次の切り替えまでカードを隠しています。</string><string name="session">Anki Popup 学習中</string><string name="speech_unavailable">読み上げ音声が使えません。オフライン音声をインストールするか、音声フォルダを指定してください。</string><string name="notice">音声・一時非表示・いつでも停止</string>
+<string name="floating_mode">他のアプリの上にカードを表示（おすすめ）</string>
+<string name="overlay_required">Android設定でAnki Popupの「他のアプリの上に表示」を許可し、戻ってもう一度「開始」を押してください。</string>
+<string name="drag_card">Anki Popup · ここをドラッグして移動</string>
 </resources>

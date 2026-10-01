@@ -1,19 +1,19 @@
-# Anki Popup for Android — notification edition
+# Anki Popup for Android — floating cards
 
-[日本語](README.ja.md) · [Download APK](https://github.com/iruom/anki-popup/releases/tag/android-v0.1.0)
+[日本語](README.ja.md) · [Download APK](https://github.com/iruom/anki-popup/releases/tag/android-v0.2.0)
 
-A native Kotlin companion for **AnkiDroid**. Front and back appear together in a quiet notification while you use other apps. The same notification updates every 30 seconds by default, with no sound or vibration.
+A native Kotlin companion for **AnkiDroid**. Front and back appear together in a movable, translucent card over other apps. Cards change every 30 seconds by default. A quiet notification provides ongoing session controls.
 
 This first release is **alpha**: built and checked with automated Android 9/API 28 and Android 15/API 35 framework tests using synthetic cards. Physical-device behavior, real AnkiDroid installations, and manufacturer battery policies still need testing. It is distributed on GitHub, not Google Play.
 
 ## Install and start
 
 1. Install [AnkiDroid](https://ankidroid.org/) and sync your decks. Open AnkiDroid once and enable its API under Settings → Advanced if it is disabled.
-2. Download **AnkiPopupAndroid-0.1.0.apk** from the Android release. Android will ask you to allow installation from the app used to open the APK. This APK is signed with the project's local release key, not the Android debug key.
+2. Download **AnkiPopupAndroid-0.2.0.apk** from the Android release. Android will ask you to allow installation from the app used to open the APK. This APK is signed with the project's local release key, not the Android debug key.
 3. Open Anki Popup and tap **Connect AnkiDroid / reload decks**. Grant the AnkiDroid API permission.
 4. Select a deck, interval, and optional front/back field names. Blank field names select common Front/Back, Expression/Meaning, 表面/裏面 names or the first two fields.
-5. Tap **Start**, and allow notifications on Android 13+.
-6. Expand the notification to read the meaning and examples. **Audio**, **Hide card**, and **Stop** are notification actions. Open the app for **Next**, settings, or restarting.
+5. Keep **Floating card over other apps** enabled and tap **Start**. Allow **Display over other apps** for Anki Popup in Android settings, return to the app, and tap Start again. Allow notifications on Android 13+.
+6. Switch to another app: the card stays over it. Drag the header to move it; the position is saved. Use **Audio**, **Next**, **Hide card**, or **Stop** on the card. The card body scrolls for longer examples.
 
 **Android 8.0/API 26 or newer**. AnkiDroid's standard `com.ichi2.anki` package is supported; parallel/debug flavors with different providers are not supported yet.
 
@@ -21,10 +21,13 @@ The app has a built-in **sample mode**, so you can test notifications without An
 
 ## How it behaves
 
-- No overlay permission, accessibility service, or screen recording is needed.
+- Floating mode requires Android’s **Display over other apps** permission. Disable the floating switch for the original notification-only mode. No accessibility service or screen recording is used.
+- The compact window does not take keyboard focus or intercept touches outside its bounds. The card itself receives touches.
+- Floating cards are hidden while the screen is off or locked; the window is excluded from screenshots/screen capture.
+- Android can suppress overlays on sensitive apps, permission dialogs, system screens, or apps that request overlays be hidden. It cannot appear over absolutely every screen.
 - A user-started foreground service keeps a single study notification visible.
-- **Hide card** replaces the card with a neutral running-session message. The existing deadline stays intact, and the next card appears at the next interval. The small service notification remains visible so the session can always be stopped.
-- **Next** is available in the app; while a card is hidden, the notification also offers Next to show one immediately.
+- **Hide card** completely removes the floating card and replaces notification content with a neutral running-session message. The existing deadline stays intact, and the next card appears at the next interval. The small service notification remains visible so the session can always be stopped.
+- **Next** is available on the floating card and in the app; while a card is hidden, the notification also offers Next to show one immediately.
 - Uses shuffled notes without repeats until a full pass is complete. Reverse cards are deduplicated.
 - Stops when you tap Stop. There is no boot autostart or automatic process restart.
 - During device sleep, updates are deferred; when scheduling resumes, it advances to one fresh card rather than flooding notifications. Battery restrictions and notification settings can change behavior.
@@ -63,7 +66,7 @@ The Gradle wrapper has a pinned distribution SHA-256. `assembleDebug` creates a 
 
 The GitHub workflow builds and tests Android, and uploads a debug APK as a development artifact. Published APKs use the maintainer's separate release key, retained locally; future updates must use the same key. GitHub is not given that private key.
 
-Tests cover the original hide deadline, automatic reappearance at 30 seconds, notification replacement and stop cleanup, private lock-screen content, shuffle boundaries, field mapping, HTML stripping, and API queries without writes. All test notes are fictional.
+Tests cover floating-window creation/removal, non-focusable window flags, lock/unlock hiding, the original hide deadline, automatic reappearance at 30 seconds, notification replacement and stop cleanup, private lock-screen content, shuffle boundaries, field mapping, HTML stripping, and API queries without writes. All test notes are fictional.
 
 ## Report a problem
 

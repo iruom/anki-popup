@@ -1,5 +1,11 @@
 package io.github.iruom.ankipopup
 
+import android.app.KeyguardManager
+import android.os.PowerManager
+import android.view.WindowManager
+import org.robolectric.shadow.api.Shadow
+import org.robolectric.shadows.ShadowWindowManagerImpl
+import org.robolectric.shadows.ShadowSettings
 import android.app.Notification
 import android.Manifest
 import android.app.NotificationManager
@@ -61,12 +67,20 @@ class AndroidIntegrationTest {
     @Test fun htmlActiveContentIsRemoved() {
         assertEquals("hello & goodbye", plainText("<script>secret</script><style>.x{}</style><img src='https://invalid.example/x'><b>hello &amp; goodbye</b> [sound:x.mp3]"))
     }
-    @Test fun notificationSessionShowsBothSidesAndHidesWithoutRestarting() {
+    @Test fun notificationSessionShowsBothSidesAndHidesWithoutRestarting() = studySession(false)
+    @Test fun floatingSessionHidesReturnsAndRemovesWindowsOnStop() = studySession(true)
+    private fun studySession(floating: Boolean) {
+        ShadowSettings.setCanDrawOverlays(floating)
+        val app = RuntimeEnvironment.getApplication()
+        shadowOf(app.getSystemService(KeyguardManager::class.java)).setKeyguardLocked(false)
+        shadowOf(app.getSystemService(PowerManager::class.java)).setIsInteractive(true)
         shadowOf(RuntimeEnvironment.getApplication()).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        RuntimeEnvironment.getApplication().getSharedPreferences("settings", 0).edit().putBoolean("overlay", floating).apply()
         val controller = Robolectric.buildService(StudyService::class.java).create()
         val service = controller.get()
         service.onStartCommand(Intent(service, StudyService::class.java).setAction(StudyService.START).putExtra("demo", true), 0, 1)
         val manager = shadowOf(service.getSystemService(NotificationManager::class.java))
+        val windows = Shadow.extract<ShadowWindowManagerImpl>(service.getSystemService(WindowManager::class.java))
         // Repository work happens on an executor. Wait only for the initial delivery.
         repeat(100) {
             shadowOf(Looper.getMainLooper()).idle()
@@ -74,13 +88,26 @@ class AndroidIntegrationTest {
             if (title == "serendipity" || title == "at your own pace") return@repeat
             Thread.sleep(10)
         }
+        if (floating) {
+            assertEquals(1, windows.views.size)
+            val params = windows.views.single().layoutParams as WindowManager.LayoutParams
+            assertEquals(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, params.type)
+            assertTrue(params.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE != 0)
+            assertTrue(params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL != 0)
+            assertTrue(params.flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+        }
         val notification = manager.getNotification(StudyService.NOTIFICATION_ID)
         assertNotNull(notification)
         assertTrue(notification.extras.getCharSequence(Notification.EXTRA_BIG_TEXT).toString().isNotBlank())
         assertEquals(Notification.VISIBILITY_PRIVATE, notification.visibility)
         assertEquals(3, notification.actions.size)
         assertNotEquals(notification.extras.getString(Notification.EXTRA_TITLE), notification.publicVersion.extras.getString(Notification.EXTRA_TITLE))
-        service.onStartCommand(Intent(service, StudyService::class.java).setAction(StudyService.HIDE), 0, 2)
+        if (floating) {
+            val card = windows.views.single() as android.widget.LinearLayout
+            val controls = card.getChildAt(3) as android.widget.LinearLayout
+            controls.getChildAt(2).performClick()
+        } else service.onStartCommand(Intent(service, StudyService::class.java).setAction(StudyService.HIDE), 0, 2)
+        if (floating) assertEquals(0, windows.views.size)
         assertEquals(service.getString(R.string.hidden), manager.getNotification(StudyService.NOTIFICATION_ID).extras.getString(Notification.EXTRA_TEXT))
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(29))
         assertEquals(service.getString(R.string.hidden), manager.getNotification(StudyService.NOTIFICATION_ID).extras.getString(Notification.EXTRA_TEXT))
@@ -89,8 +116,18 @@ class AndroidIntegrationTest {
         service.onStartCommand(Intent(service, StudyService::class.java).setAction(StudyService.NEXT), 0, 3)
         assertNotEquals(service.getString(R.string.hidden), manager.getNotification(StudyService.NOTIFICATION_ID).extras.getString(Notification.EXTRA_TEXT))
         assertEquals(1, manager.allNotifications.size)
+        if (floating) {
+            assertEquals(1, windows.views.size)
+            shadowOf(service.getSystemService(KeyguardManager::class.java)).setKeyguardLocked(true)
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(1))
+            assertEquals(0, windows.views.size)
+            shadowOf(service.getSystemService(KeyguardManager::class.java)).setKeyguardLocked(false)
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(1))
+            assertEquals(1, windows.views.size)
+        }
         controller.destroy()
         assertFalse(StudyService.running)
         assertEquals(0, manager.allNotifications.size)
+        if (floating) assertEquals(0, windows.views.size)
     }
 }

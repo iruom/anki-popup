@@ -3,6 +3,10 @@ package io.github.iruom.ankipopup
 import android.Manifest
 import android.app.*
 import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import android.provider.Settings
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.net.Uri
@@ -25,6 +29,13 @@ class StudyService : Service() {
     private val prefs by lazy { getSharedPreferences("settings", MODE_PRIVATE) }
     private val manager by lazy { getSystemService(NotificationManager::class.java) }
     private lateinit var audio: LocalAudio
+    private lateinit var floating: FloatingCard
+    private var overlayEnabled = false
+    private val screenEvents = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_SCREEN_OFF) { floating.hide(); audio.stop() } else refreshOverlay()
+        }
+    }
     private var cards = emptyList<StudyCard>()
     private var current: StudyCard? = null
     private var bag: ShuffleBag? = null
@@ -38,7 +49,8 @@ class StudyService : Service() {
         override fun run() {
             if (!alive || cards.isEmpty()) return
             if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) { stopSelf(); return }
-            if (cycle.due(SystemClock.elapsedRealtime())) nextCard()
+            if (overlayEnabled && !Settings.canDrawOverlays(this@StudyService)) { floating.hide(); showError(R.string.overlay_required); return }
+            if (cycle.due(SystemClock.elapsedRealtime())) nextCard() else refreshOverlay()
             handler.postDelayed(this, 1000)
         }
     }
@@ -48,6 +60,9 @@ class StudyService : Service() {
             setSound(null, null); enableVibration(false); lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         })
         audio = LocalAudio(this)
+        floating = FloatingCard(this) { command -> onStartCommand(Intent(this, StudyService::class.java).setAction(command), 0, 0) }
+        val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON); addAction(Intent.ACTION_USER_PRESENT) }
+        if (Build.VERSION.SDK_INT >= 33) registerReceiver(screenEvents, filter, RECEIVER_NOT_EXPORTED) else registerReceiver(screenEvents, filter)
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action != START && !running) { stopSelf(); return START_NOT_STICKY }
@@ -61,6 +76,9 @@ class StudyService : Service() {
         return START_NOT_STICKY
     }
     private fun startSession(demo: Boolean) {
+        overlayEnabled = prefs.getBoolean("overlay", true)
+        floating.hide()
+        if (overlayEnabled && !Settings.canDrawOverlays(this)) { showError(R.string.overlay_required); return }
         manager.cancel(NOTIFICATION_ID + 1)
         val notification = notification(getString(R.string.app_name), getString(R.string.preparing), hidden = true)
         try {
@@ -100,9 +118,18 @@ class StudyService : Service() {
     }
     private fun showCard() {
         val card = current ?: return
+        refreshOverlay()
         if (cycle.hidden) manager.notify(NOTIFICATION_ID, notification(getString(R.string.session), getString(R.string.hidden), true))
         else manager.notify(NOTIFICATION_ID, notification(card.front, listOf(card.back, *card.extras.toTypedArray()).filter { it.isNotBlank() }.joinToString("\n\n"), false))
     }
+    private fun refreshOverlay() {
+        val card = current
+        val unlocked = !getSystemService(KeyguardManager::class.java).isKeyguardLocked && getSystemService(PowerManager::class.java).isInteractive
+        if (overlayEnabled && !cycle.hidden && unlocked && card != null) {
+            try { floating.show(card) } catch (_: Exception) { floating.hide(); showError(R.string.overlay_required) }
+        } else floating.hide()
+    }
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) { super.onConfigurationChanged(newConfig); floating.hide(); refreshOverlay() }
     private fun action(action: String, request: Int): PendingIntent = PendingIntent.getService(this, request,
         Intent(this, StudyService::class.java).setAction(action), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     private fun notification(title: String, body: String, hidden: Boolean): Notification {
@@ -122,6 +149,7 @@ class StudyService : Service() {
             }.build()
     }
     private fun showError(message: Int) {
+        floating.hide()
         val notice = notification(getString(R.string.app_name), getString(message), true)
         stopForeground(STOP_FOREGROUND_REMOVE)
         manager.notify(NOTIFICATION_ID + 1, Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
@@ -132,6 +160,7 @@ class StudyService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
     override fun onDestroy() {
         alive = false; running = false; generation++
+        unregisterReceiver(screenEvents); floating.hide()
         handler.removeCallbacksAndMessages(null); worker.shutdownNow(); audio.close()
         stopForeground(STOP_FOREGROUND_REMOVE); manager.cancel(NOTIFICATION_ID)
         super.onDestroy()
