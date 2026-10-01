@@ -1,5 +1,7 @@
 # Anki Popup
 
+**Android notification edition is now available as an alpha:** [Download APK](https://github.com/iruom/anki-popup/releases/tag/android-v0.1.0) · [Android setup guide](android/README.md). The rest of this page describes the Mac app.
+
 **A little Anki on your desktop.** Random notes, front and back together, on a quiet floating card.
 
 [日本語](README.ja.md) · [Download for macOS](https://github.com/iruom/anki-popup/releases/latest) · [Report an issue](https://github.com/iruom/anki-popup/issues/new/choose)

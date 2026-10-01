@@ -1,5 +1,7 @@
 # Anki Popup
 
+**Android通知版のアルファ版も公開:** [APKダウンロード](https://github.com/iruom/anki-popup/releases/tag/android-v0.1.0) · [Android版の使い方](android/README.ja.md)。以下はMac版の説明です。
+
 **作業中に、Ankiの単語が少しずつ目に入る。** 表と裏を一緒に表示する、Mac用の小さな常駐アプリです。
 
 [English](README.md) · [ダウンロード](https://github.com/iruom/anki-popup/releases/latest) · [不具合の報告](https://github.com/iruom/anki-popup/issues/new/choose)

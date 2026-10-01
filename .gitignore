@@ -9,3 +9,13 @@ collection.media/
 .env
 *.p12
 *.mobileprovision
+
+# Android local state and signing material
+android/.gradle/
+android/.kotlin/
+android/local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+.idea/

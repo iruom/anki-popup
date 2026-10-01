@@ -1,0 +1,35 @@
+<resources>
+<string name="app_name">Anki Popup</string>
+<string name="tagline">A little learning, in your notifications.</string>
+<string name="intro">Choose an AnkiDroid deck. Front and back appear together in one quiet notification, updated every 30 seconds by default.</string>
+<string name="connect">Connect AnkiDroid / reload decks</string>
+<string name="all_decks">All decks</string>
+<string name="deck">Deck</string>
+<string name="interval">Interval in seconds (5–3600)</string>
+<string name="front_field">Front field name (blank = automatic)</string>
+<string name="back_field">Back field name (blank = automatic)</string>
+<string name="language">Reading language (e.g. en-US, ja-JP)</string>
+<string name="start">Start</string><string name="next">Next</string><string name="stop">Stop</string><string name="hide">Hide card</string><string name="audio">Audio</string>
+<string name="demo">Try with sample notes</string>
+<string name="media">Choose saved-audio folder (optional)</string>
+<string name="clear_media">Use device speech instead</string>
+<string name="media_set">Saved-audio folder selected; device speech is the fallback.</string>
+<string name="media_unset">Audio uses device speech. A readable media folder can provide Anki recordings.</string>
+<string name="limits">Displays text fields, not custom card templates or cloze formatting. Includes child decks. No review history is changed. Sessions may pause during sleep or battery restrictions.</string>
+<string name="privacy">Your notes stay on this device. AnkiDroid requests a read/write API permission; this app only queries it. Notification content is marked private on the lock screen. Device speech uses an offline voice when available.</string>
+<string name="ready">Ready. Start when you want to study.</string>
+<string name="working">Loading…</string>
+<string name="running">Study session running. Expand the notification for the answer.</string>
+<string name="stopped">Stopped.</string>
+<string name="api_missing">Install AnkiDroid, open it once, and enable its API in Settings → Advanced. Then connect again.</string>
+<string name="api_denied">AnkiDroid access was not granted. Sample mode still works.</string>
+<string name="notification_denied">Allow notifications in Android settings before starting.</string>
+<string name="bad_interval">Choose a whole-number interval from 5 to 3600 seconds.</string>
+<string name="no_cards">No matching notes. Check the deck and front/back field names.</string>
+<string name="error">Could not load AnkiDroid. Check its API permission and selected fields, then try again.</string>
+<string name="channel">Study cards</string><string name="preparing">Preparing your study session…</string>
+<string name="hidden">Card hidden until the next scheduled change.</string>
+<string name="session">Anki Popup study session</string>
+<string name="speech_unavailable">No speech voice is ready. Install an offline voice or choose a readable audio folder.</string>
+<string name="notice">Audio · hide until next card · stop at any time</string>
+</resources>
